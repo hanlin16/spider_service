@@ -1,0 +1,2 @@
+interface_url = 'http://172.16.42.253:8080/publiccms/admin/cmsImport/reptile'
+# interface_url = 'http://192.168.30.152:8095/publiccms/admin/cmsImport/reptile'
