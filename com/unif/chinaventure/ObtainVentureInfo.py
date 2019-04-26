@@ -1,15 +1,15 @@
 # coding:utf-8
-import re  # 正则表达式
-import urllib
-import json
-from urllib.request import urlopen
 
 from bs4 import BeautifulSoup
+
+from com.unif.util.LogUtil import LogUtil
+
+logger = LogUtil.get_logger('ObtainVentureInfo')
 
 
 class ObtainVentureInfo:
     def __init__(self):
-        print("初始化ObtainInfo")
+        logger.info("初始化:ObtainVentureInfo")
 
     # 获取标题
     def find_title(self, data):
@@ -45,8 +45,8 @@ class ObtainVentureInfo:
         result = {}
         import json
         hjson = json.loads(data, strict=False)
-        print('-------------------')
-        print(hjson)
+        logger.info('-------------------')
+        logger.info(hjson)
         if hjson['data']['list'] is None:
             return result
         length = len(hjson['data']['list'])
@@ -66,8 +66,7 @@ class ObtainVentureInfo:
         result = {}
         import json
         hjson = json.loads(data, strict=False)
-        print('-------------------')
-        print(hjson)
+        logger.info(hjson)
         if hjson['data'] is None:
             return result
         length = len(hjson['data'])
@@ -92,12 +91,9 @@ class ObtainVentureInfo:
 
     # 获取文章摘要
     def find_subject(self, data):
-        text = ''
         soup = BeautifulSoup(data, 'html.parser', from_encoding='utf-8')
-        subject = soup.find_all('div')
-        if len(subject) >= 2:
-            text = str(subject[1])
-        return text
+        text = soup.find("meta", {"name": "description"})['content']
+        return str(text)
 
     # 获取文章编辑
     def find_editor(self, data):
@@ -117,10 +113,10 @@ class ObtainVentureInfo:
     def find_context(self, data):
         text = ''
         soup = BeautifulSoup(data, 'html.parser', from_encoding='utf-8')
-        content = soup.find_all('div', class_='content_01 m_t_30 detasbmo')
-        if len(content) >= 1:
-            content = str(content[0])
-            text = str(content)
+        content = soup.find('div', class_='content_01 m_t_30 detasbmo')
+        if content is None:
+            return text
+        text = str(content)
         return text
 
     # 文章发布时间

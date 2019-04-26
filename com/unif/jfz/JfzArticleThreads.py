@@ -1,6 +1,10 @@
 # coding:utf-8
 import threading
+
 from com.unif.util.HttpUtil import HttpUtil
+from com.unif.util.LogUtil import LogUtil
+
+logger = LogUtil.get_logger('JfzArticleThreads')
 
 
 class JfzArticleThreads(threading.Thread):
@@ -12,14 +16,16 @@ class JfzArticleThreads(threading.Thread):
         self.save = save
         self.categoryName = categoryName
         self.tag = tag
+        logger.info("初始化:JfzArticleThreads")
 
     def run(self):
-        print("开始线程:", self.thread_id)
+        logger.info("开始线程:", self.thread_id)
         i = 0
+        flag = True
         while True:
             i = i + 1
             act_url = self.url + 'p' + str(i) + '.html'
-            print(act_url)
+            logger.info(act_url)
             html = HttpUtil.get_html(act_url)
 
             if html is None:
@@ -29,7 +35,12 @@ class JfzArticleThreads(threading.Thread):
             if len(pages) == 0:
                 return
             for key, desc in pages.items():
-                self.save.save_article(self.categoryName, self.tag, key, desc)
+                flag = self.save.save_article(self.categoryName, self.tag, key, desc)
+                if not flag:
+                    break
+
+            if not flag:
+                break
 
         def __del__(self):
-            print(self.thread_id, "线程结束！)")
+            logger.info(self.thread_id, "线程结束！)")

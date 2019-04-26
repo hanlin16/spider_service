@@ -1,12 +1,15 @@
 # coding:utf-8
 from com.unif.chinaventure.ObtainVentureInfo import ObtainVentureInfo
-from com.unif.chinaventure.VentureThreads import VentureThreads
 from com.unif.chinaventure.SaveVentureArticle import SaveVentureArticle
+from com.unif.chinaventure.VentureThreads import VentureThreads
+from com.unif.util.LogUtil import LogUtil
+
+logger = LogUtil.get_logger('SpiderVentureArticle')
 
 
 class SpiderVentureArticle:
     def __init__(self):
-        print("初始化投中界爬虫类")
+        logger.info("初始化:SpiderVentureArticle")
 
     # 执行爬虫
     def executeSpider(self):
@@ -44,4 +47,4 @@ class SpiderVentureArticle:
         for t in threads:
             t.join()
 
-        print("主进程投中网站爬取结束！")
+        logger.info("主进程投中网站爬取结束！")

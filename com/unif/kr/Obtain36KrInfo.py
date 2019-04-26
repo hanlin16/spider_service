@@ -6,10 +6,14 @@ import re
 
 from bs4 import BeautifulSoup
 
+from com.unif.util.LogUtil import LogUtil
+
+logger = LogUtil.get_logger('Obtain36KrInfo')
+
 
 class Obtain36KrInfo:
     def __init__(self):
-        print("初始化Obtain36KrInfo")
+        logger.info("初始化:Obtain36KrInfo")
 
     # 获取标题
     def find_title(self, data):
@@ -54,7 +58,7 @@ class Obtain36KrInfo:
     def find_pages2(self, data):
         result = {}
         hjson = json.loads(data, strict=False)
-        print(hjson)
+        logger.info(hjson)
         i_data = hjson['data']
         if i_data is None:
             return result
@@ -115,7 +119,7 @@ class Obtain36KrInfo:
 
     # 获取文章内容
     def find_context(self, data):
-        text = ''
+        text = None
         soup = BeautifulSoup(data, 'html.parser', from_encoding='utf-8')
         content = soup.find_all('div', class_='common-width content articleDetailContent kr-rich-text-wrapper')
         if len(content) >= 1:
@@ -139,20 +143,20 @@ class Obtain36KrInfo:
         if not soup.a is None:
             author.append(soup.a.string)
         if not soup.span is None:
-            time = str(soup.span)
-            if time.find('小时'):
-                time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            elif time.find('昨'):
-                time = (datetime.datetime.now() + datetime.timedelta(days=-1)).strftime("%Y-%m-%d %H:%M:%S")
+            public_time = str(soup.span)
+            if public_time.find('小时'):
+                public_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            elif public_time.find('昨'):
+                public_time = (datetime.datetime.now() + datetime.timedelta(days=-1)).strftime("%Y-%m-%d %H:%M:%S")
             else:
                 mat = re.search(r"(\d{4}-\d{1,2}-\d{1,2})", test_date)
-                time = mat.groups()[0]
+                public_time = mat.groups()[0]
 
-        if time is None:
+        if public_time is None:
             return author
-        if time.find(':') < 0:
-            time = time + ' 00:00:00'
-        author.append(time)
+        if public_time.find(':') < 0:
+            public_time = public_time + ' 00:00:00'
+        author.append(public_time)
 
         return author
 

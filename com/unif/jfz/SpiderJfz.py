@@ -1,13 +1,16 @@
 # coding:utf-8
-from com.unif.jfz.ObtainJfzInfo import ObtainJfzInfo
 from com.unif.jfz.JfzArticleThreads import JfzArticleThreads
 from com.unif.jfz.JfzVideoThreads import JfzVideoThreads
+from com.unif.jfz.ObtainJfzInfo import ObtainJfzInfo
 from com.unif.jfz.SaveJfzArticle import SaveJfzArticle
+from com.unif.util.LogUtil import LogUtil
+
+logger = LogUtil.get_logger('SpiderJfz')
 
 
 class SpiderJfz:
     def __init__(self):
-        print("初始化36Kr爬虫类")
+        logger.info("初始化:SpiderJfz")
 
     # 1.执行爬虫，爬取【文章】信息
     def executeSpiderArticle(self):
@@ -36,7 +39,7 @@ class SpiderJfz:
         for t in threads:
             t.join()
 
-        print("主进程金斧子网站爬取文章信息结束！")
+        logger.info("主进程金斧子网站爬取文章信息结束！")
 
     # 2.执行爬虫，爬取【视频】信息
     def executeSpiderVideo(self):
@@ -51,6 +54,7 @@ class SpiderJfz:
 
         i = 1
         threads = []
+
         for url, name in urls.items():
             # 创建新线程
             i = i + 1
@@ -67,4 +71,4 @@ class SpiderJfz:
         for t in threads:
             t.join()
 
-        print("主进程金斧子网网站爬取视频结束！")
+        logger.info("主进程金斧子网网站爬取视频结束！")

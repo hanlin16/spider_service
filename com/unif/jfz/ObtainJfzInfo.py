@@ -2,10 +2,14 @@
 
 from bs4 import BeautifulSoup
 
+from com.unif.util.LogUtil import LogUtil
+
+logger = LogUtil.get_logger('ObtainJfzInfo')
+
 
 class ObtainJfzInfo:
     def __init__(self):
-        print("初始化Obtain36KrInfo")
+        logger.info("初始化:ObtainJfzInfo")
 
     # 获取标题
     def find_title(self, data):
@@ -44,7 +48,7 @@ class ObtainJfzInfo:
     # 获取视频分页列表
     def find_video_pages(self, data):
         result = {}
-        time = []
+        times = []
         soup = BeautifulSoup(data, 'html.parser', from_encoding='utf-8')
         content = soup.find_all('div', class_='list-video-card')
         if content is None:
@@ -58,9 +62,9 @@ class ObtainJfzInfo:
             if info is None:
                 continue
             if len(info) > 1:
-                time.append(info[1].string + ' 00:00:00')
+                times.append(info[1].string + ' 00:00:00')
 
-        return result, time
+        return result, times
 
     # 查找最后一处位置
     def find_last(self, string, begin, str):
@@ -157,10 +161,10 @@ class ObtainJfzInfo:
         content = soup.find('div', class_='thread-item forum-article-head').find('div', class_='stat-list').div.string
 
         if not content is None:
-            time = content.string
-            if time.find(':') < 0:
-                time = time + ': 00:00:00'
-            author.append(time)
+            public_time = content.string
+            if public_time.find(':') < 0:
+                public_time = public_time + ' 00:00:00'
+            author.append(public_time)
 
         return author
 

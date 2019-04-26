@@ -1,14 +1,16 @@
 # coding:utf-8
 from com.unif.pedily.ObtainPeDailyInfo import ObtainPeDailyInfo
-from com.unif.pedily.SavePeDailyArticle import SaveArticle
 from com.unif.pedily.PeDailyThreads import PeDailyThreads
+from com.unif.pedily.SavePeDailyArticle import SaveArticle
+from com.unif.util.LogUtil import LogUtil
+
+logger = LogUtil.get_logger('SpiderPeDailyArticle')
 
 
 class SpiderPeDailyArticle:
     def __init__(self):
-        print("初始化投资界爬虫类")
+        logger.info("初始化:SpiderPeDailyArticle")  # 执行爬虫
 
-    # 执行爬虫
     def executeSpider(self):
         obtain = ObtainPeDailyInfo()
         urls = {
@@ -35,4 +37,4 @@ class SpiderPeDailyArticle:
         for t in threads:
             t.join()
 
-        print("主进程投资界网站爬取结束！")
+        logger.info("主进程投资界网站爬取结束！")

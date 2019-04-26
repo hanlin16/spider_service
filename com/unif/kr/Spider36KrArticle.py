@@ -1,12 +1,15 @@
 # coding:utf-8
-from com.unif.kr.Obtain36KrInfo import Obtain36KrInfo
 from com.unif.kr.KrThreads import KrThreads
+from com.unif.kr.Obtain36KrInfo import Obtain36KrInfo
 from com.unif.kr.SaveKrArticle import SaveKrArticle
+from com.unif.util.LogUtil import LogUtil
+
+logger = LogUtil.get_logger('Spider36KrArticle')
 
 
 class Spider36KrArticle:
     def __init__(self):
-        print("初始化36Kr爬虫类")
+        logger.info("初始化:Spider36KrArticle")
 
     # 执行爬虫
     def executeSpider(self):
@@ -15,13 +18,13 @@ class Spider36KrArticle:
 
         urls = {
             "https://36kr.com/information/contact": "创投",
-             "https://36kr.com/information/technology": "科技",
-             "https://36kr.com/information/happy_life": "生活",
-             "https://36kr.com/information/web_zhichang": "职场",
-             "https://36kr.com/information/travel": "出行",
-             "https://36kr.com/information/innovate": "创新",
-             "https://36kr.com/information/real_estate": "房产",
-             "https://36kr.com/information/other": "其他"
+            "https://36kr.com/information/technology": "科技",
+            "https://36kr.com/information/happy_life": "生活",
+            "https://36kr.com/information/web_zhichang": "职场",
+            "https://36kr.com/information/travel": "出行",
+            "https://36kr.com/information/innovate": "创新",
+            "https://36kr.com/information/real_estate": "房产",
+            "https://36kr.com/information/other": "其他"
         }
         sub_url = [
             'https://36kr.com/pp/api/feed-stream?type=web&feed_id=305',
@@ -52,4 +55,4 @@ class Spider36KrArticle:
         for t in threads:
             t.join()
 
-        print("主进程投中网站爬取结束！")
+        logger.info("主进程投中网站爬取结束！")

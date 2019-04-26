@@ -1,13 +1,16 @@
 # coding:utf-8
 
 from com.unif.simuwang.ObtainSimuwangInfo import ObtainSimuwangInfo
-from com.unif.simuwang.SaveSimuwangArticle import SaveArticle
+from com.unif.simuwang.SaveSimuwangArticle import SaveSimuwangArticle
 from com.unif.simuwang.SimuwangThreads import SimuwangThreads
+from com.unif.util.LogUtil import LogUtil
+
+logger = LogUtil.get_logger('SpiderSimuwangArticle')
 
 
 class SpiderSimuwangArticle:
     def __init__(self):
-        print("初始化投资界爬虫类")
+        logger.info("初始化:SpiderSimuwangArticle")
 
     # 执行爬虫
     def executeSpider(self):
@@ -15,7 +18,7 @@ class SpiderSimuwangArticle:
         urls = {
             'https://www.simuwang.com/news/lists.html': '资讯',
         }
-        save = SaveArticle()
+        save = SaveSimuwangArticle()
 
         i = 0
         threads = []
@@ -33,4 +36,4 @@ class SpiderSimuwangArticle:
         for t in threads:
             t.join()
 
-        print("主进程投资界网站爬取结束！")
+        logger.info("主进程投资界网站爬取结束！")

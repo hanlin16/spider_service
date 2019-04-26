@@ -1,17 +1,19 @@
 # coding:utf-8
 import base64
 import json
-import os
-import urllib
-from urllib.request import urlopen
+import time
 
 from com.unif.simuwang.ObtainSimuwangInfo import ObtainSimuwangInfo
+from com.unif.util.DateUtil import DateUtil
 from com.unif.util.HttpUtil import HttpUtil
+from com.unif.util.LogUtil import LogUtil
 from com.unif.vo.paramater import paramater
+
+logger = LogUtil.get_logger('SaveSimuwangArticle')
 
 
 # 保存文章
-class SaveArticle:
+class SaveSimuwangArticle:
     USER_AGENTS = [
         'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36 OPR/26.0.1656.60',
         'Opera/8.0 (Windows NT 5.1; U; en)',
@@ -37,88 +39,40 @@ class SaveArticle:
         self.default_value_author = "私募排排网作者"
         self.default_value_editor = "私募排排网编辑"
         # self.proxy = HttpUtil.get_proxy()
-        print("初始化SaveArticle")
+        logger.info("初始化:SaveSimuwangArticle")
 
     # 保存文章
     def save_article(self, categoryName, url, imgurl):
-        # opener = urllib.request.build_opener(urllib.request.HTTPHandler)
-        # headers = {
-        #     "Connection": "keep-alive",
-        #     "Cache-Control": "max-age=0",
-        #     "Upgrade-Insecure-Requests": "1",
-        #     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
-        #     "Accept-Language": "zh-CN,zh;q=0.9",
-        #     "Cookie": "RY=baidu"
-        # }
-        # urllib.request.install_opener(opener)
-        # opener.addheaders = headers
-
-        # response = None
-        # try:
-        #     # 从列表中随机选择UA和代理
-        #     user_agent = random.choice(self.USER_AGENTS)
-        #     proxy = random.choice(self.proxy)
-        #     referer = url  # 随机选择访问url地址
-        #     # 构建一个Handler处理器对象，参数是一个字典类型，包括代理类型和代理服务器IP+PROT
-        #     httpproxy_handler = urllib2.ProxyHandler({"http": proxy})
-        #     opener = urllib2.build_opener(httpproxy_handler)
-        #     urllib2.install_opener(opener)
-        #     request = urllib2.Request(referer, headers=headers)
-        #     request.add_header("User-Agent", user_agent)
-        #     response = urllib2.urlopen(request)
-
-        opener = urllib.request.build_opener(urllib.request.HTTPHandler)
-        headers = [
-            ('User-Agnet', 'Mozilla/5.0 (Windows NT 6.3; WOW64; Trident/7.0; rv:11.0) like Gecko')
-        ]
-        urllib.request.install_opener(opener)
-        opener.addheaders = headers
-        try:
-            res = opener.open(url, timeout=1000)
-        except Exception as e:
-            if hasattr(e, 'reason'):
-                print('reason:', e.reason)
-                return
-            elif hasattr(e, 'code'):
-                print('error code:', e.code)
-                return
-            else:
-                return
-        # if (type(response) == None):
-        #     print('未接收到数据')
-        #     return
-        data = res.read()
+        logger.info("视频网页地址：" + url)
+        data = HttpUtil.get_html(url)
+        if data is None:
+            return True
         soup_obj = self.obtainInfo.get_soup_obj(data)
         title = self.obtainInfo.get_title(soup_obj)
-        time = self.obtainInfo.get_time(soup_obj)
+        public_time = self.obtainInfo.get_time(soup_obj)
+
+        if public_time is None or public_time.find('前'):
+            public_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+
+        flag = DateUtil.verify_time(public_time)
+        if not flag:
+            return False
+
         subject = self.obtainInfo.get_desc(soup_obj)
         context = self.obtainInfo.get_content(soup_obj)
         tags = self.obtainInfo.get_tag(soup_obj)
         author = self.obtainInfo.get_author(soup_obj)
         if not context is None:
-            # self.save_context(title, time, imgurl, tags, subject, context)
             # 对文章内容加密
             context = context.encode('utf-8')
             bs64 = base64.b64encode(context)
             p = paramater(categoryName, title, author, author,
                           str(subject), str(bs64),
-                          imgurl, tags, self.default_value_source, url, time)
+                          imgurl, tags, self.default_value_source, url, public_time)
             over_dict = p.__dict__
             result = json.dumps(over_dict, ensure_ascii=False)
             js = json.loads(result)
             # 请求数据
             HttpUtil.post(js)
 
-    # 执行保存
-    def save_context(self, title, time, img, tags, subject, context):
-        if not os.path.exists('article'):
-            article_path = os.path.join(os.path.abspath('.'), 'article')
-            os.mkdir(article_path)
-        try:
-            fout = open('./article/' + title + '.txt', 'wb')
-            content = title + '\n' + str(time) + '\n' + str(img) + '\n' + str(tags) + '\n' + str(subject) + '\n' + str(
-                context)
-            bytes = content.encode('utf-8')
-            fout.write(bytes)
-        except IOError as e:
-            print(e)
+        return True

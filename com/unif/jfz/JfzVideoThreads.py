@@ -1,6 +1,12 @@
 # coding:utf-8
 import threading
+import time
+
+from com.unif.util.DateUtil import DateUtil
 from com.unif.util.HttpUtil import HttpUtil
+from com.unif.util.LogUtil import LogUtil
+
+logger = LogUtil.get_logger('JfzVideoThreads')
 
 
 class JfzVideoThreads(threading.Thread):
@@ -12,14 +18,16 @@ class JfzVideoThreads(threading.Thread):
         self.save = save
         self.categoryName = categoryName
         self.tag = tag
+        logger.info("初始化:JfzVideoThreads")
 
     def run(self):
-        print("开始线程:", self.thread_id)
-        i = 4
+        logger.info("开始线程:", self.thread_id)
+        i = 0
+        flag = True
         while True:
             i = i + 1
             act_url = self.url + str(i)
-            print(act_url)
+            logger.info(act_url)
             html = HttpUtil.get_html(act_url)
 
             if html is None:
@@ -30,8 +38,16 @@ class JfzVideoThreads(threading.Thread):
                 return
             num = 0
             for url, img in pages.items():
-                time = times[num]
-                self.save.save_video(self.categoryName, self.tag, url, img, time)
+                public_time = times[num]
+                if public_time is None or public_time.find('前'):
+                    public_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+                flag = DateUtil.verify_time(public_time)
+                if not flag:
+                    break
+                self.save.save_video(self.categoryName, self.tag, url, img, public_time)
+
+            if not flag:
+                break
 
         def __del__(self):
-            print(self.thread_id, "线程结束！)")
+            logger.info(self.thread_id, "线程结束！)")

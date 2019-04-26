@@ -3,10 +3,14 @@ import re  # 正则表达式
 
 from bs4 import BeautifulSoup
 
+from com.unif.util.LogUtil import LogUtil
+
+logger = LogUtil.get_logger('ObtainPeDailyInfo')
+
 
 class ObtainPeDailyInfo:
     def __init__(self):
-        print("初始化ObtainInfo")
+        logger.info("初始化:ObtainPeDailyInfo")
 
     # 获取标题
     def find_title(self, data):
@@ -75,12 +79,12 @@ class ObtainPeDailyInfo:
 
     # 文章发布时间
     def find_time(self, data):
-        time = ''
+        public_time = ''
         soup = BeautifulSoup(data, 'html.parser', from_encoding='utf-8')
         subject = soup.find_all('span', class_='date')
         if len(subject) >= 1:
-            time = subject[0].string
-        return time + ':00'
+            public_time = subject[0].string
+        return public_time + ':00'
 
     # 获得文章_图片地址
     def find_page_info(self, html):

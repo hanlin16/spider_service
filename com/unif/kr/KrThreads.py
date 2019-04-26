@@ -1,6 +1,10 @@
 # coding:utf-8
 import threading
+
 from com.unif.util.HttpUtil import HttpUtil
+from com.unif.util.LogUtil import LogUtil
+
+logger = LogUtil.get_logger('KrThreads')
 
 
 class KrThreads(threading.Thread):
@@ -13,11 +17,12 @@ class KrThreads(threading.Thread):
         self.categoryName = categoryName
         self.sub_url = sub_url
         self.tag = tag
+        logger.info("初始化:KrThreads")
 
     def run(self):
-        print("开始线程:", self.thread_id)
+        logger.info("开始线程:", self.thread_id)
         act_url = self.url
-        print(act_url)
+        logger.info(act_url)
         html = HttpUtil.get_html(act_url)
 
         if html is None:
@@ -26,12 +31,11 @@ class KrThreads(threading.Thread):
         pages, b_id = self.obtain.find_pages1(html.decode("UTF-8"))
 
         for key, value in pages.items():
-           self.save.save_article(self.categoryName, self.tag, key, value)
-
+            self.save.save_article(self.categoryName, self.tag, key, value)
 
         while True:
             act_url = self.sub_url + '&b_id=' + str(b_id) + '&per_page=30'
-            print('分页URL:'+act_url)
+            logger.info('分页URL:' + act_url)
             html = HttpUtil.get_html(act_url)
 
             if html is None:
@@ -43,6 +47,5 @@ class KrThreads(threading.Thread):
             for key, value in pages.items():
                 self.save.save_article(self.categoryName, self.tag, key, value)
 
-
     def __del__(self):
-        print(self.thread_id, "线程结束！)")
+        logger.info(self.thread_id, "线程结束！)")

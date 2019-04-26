@@ -1,14 +1,16 @@
 # coding:utf-8
 import datetime
-import urllib
-from urllib.request import urlopen
 
 from bs4 import BeautifulSoup
+
+from com.unif.util.LogUtil import LogUtil
+
+logger = LogUtil.get_logger('ObtainSimuwangInfo')
 
 
 class ObtainSimuwangInfo:
     def __init__(self):
-        print("初始化ObtainInfo")
+        logger.info("初始化:ObtainSimuwangInfo")
 
     def get_soup_obj(self, html_str):
         return BeautifulSoup(html_str, 'html.parser', from_encoding='utf-8')
@@ -40,24 +42,12 @@ class ObtainSimuwangInfo:
         return "资讯"
 
     def find_time(self, data):
-        time = ''
+        public_time = ''
         soup = BeautifulSoup(data, 'html.parser', from_encoding='utf-8')
         subject = soup.find_all('span', class_='date')
         if len(subject) >= 1:
-            time = subject[0].string
-        return time + ':00'
-
-    # 获取网页源代码
-    def get_html(self, url):
-        opener = urllib.request.build_opener(urllib.request.HTTPHandler)
-        headers = [
-            ('User-Agent', 'Mozilla/5.0 (Windows NT 6.3; WOW64; Trident/7.0; rv:11.0) like Gecko')
-        ]
-        urllib.request.install_opener(opener)
-        opener.addheaders = headers
-        res = opener.open(url, timeout=2000)
-        html = res.read()  # 读取页面源代码
-        return html
+            public_time = subject[0].string
+        return public_time + ':00'
 
     # 根据页面html获取键值对
     def find_page_info_by_html_str(self, htmlStr):

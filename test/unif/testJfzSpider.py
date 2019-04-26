@@ -5,7 +5,7 @@ from com.unif.jfz.SpiderJfz import SpiderJfz
 
 def main():
     spider = SpiderJfz()
-    # spider.executeSpiderArticle()
+    #spider.executeSpiderArticle()
     spider.executeSpiderVideo()
 
 

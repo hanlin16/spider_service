@@ -1,6 +1,11 @@
 # coding:utf-8
 import threading
+
 from com.unif.util.HttpUtil import HttpUtil
+from com.unif.util.LogUtil import LogUtil
+
+logger = LogUtil.get_logger('VentureThreads')
+
 
 class VentureThreads(threading.Thread):
     def __init__(self, thread_id, url, categoryName, obtain, save, type):
@@ -11,15 +16,17 @@ class VentureThreads(threading.Thread):
         self.save = save
         self.categoryName = categoryName
         self.type = type
+        logger.info("初始化:VentureThreads")
 
     def run(self):
-        print("开始线程:", self.thread_id)
+        logger.info("开始线程:", self.thread_id)
 
         i = 0
+        flag = True
         while True:
             i = i + 1
             act_url = self.url + str(i) + '-10.shtml'
-            print(act_url)
+            logger.info(act_url)
             html = HttpUtil.get_html(act_url)
             if html is None:
                 continue
@@ -31,9 +38,15 @@ class VentureThreads(threading.Thread):
             if len(pages) == 0:
                 break
             num = 0
+
             for key, value in pages.items():
-                self.save.save_article(self.categoryName, key, value)
+                flag = self.save.save_article(self.categoryName, key, value)
+                if not flag:
+                    break
                 num = num + 1
 
+            if not flag:
+                break
+
     def __del__(self):
-        print(self.thread_id, "线程结束！)")
+        logger.info(self.thread_id, "线程结束！)")

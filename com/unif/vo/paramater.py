@@ -34,7 +34,7 @@ class paramater:
         self.sourceUrl = sourceUrl
 
         self.importDateStr = importDateStr
-        #print("初始化paramater类")
+        #logger.info("初始化paramater类")
 
 
 p = paramater('categoryName', 'title',
@@ -44,4 +44,4 @@ p = paramater('categoryName', 'title',
 
 overdict = p.__dict__
 result = json.dumps(overdict, ensure_ascii=False)
-#print(result)
+#logger.info(result)
